@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
             buttonLogin = findViewById(R.id.buttonLogin);
 
-            Intent loginIntent = new Intent(this, HomeScreen.class);
+            Intent loginIntent = new Intent(this, DashboardActivity.class);
             buttonLogin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -1,22 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DashboardActivity">
+    android:padding="16dp">
 
+    <!-- Top Navigation Buttons -->
+    <ImageButton
+        android:id="@+id/dashboard_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/baseline_arrow_back_24"
+        android:contentDescription="Dashboard"
+        android:background="@null" />
+
+    <ImageButton
+        android:id="@+id/account_settings_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/baseline_account_circle_24"
+        android:contentDescription="Account Settings"
+        android:background="@null" />
+
+    <!-- Quick Access Section -->
     <TextView
+        android:id="@+id/quick_access_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="THIS IS THE DASHBOARD"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        android:layout_below="@id/dashboard_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Quick Access"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
+    <LinearLayout
+        android:id="@+id/quick_access_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/quick_access_label"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:gravity="center">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/inventory_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Inventory"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/orders_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Orders"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/fridges_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fridges"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/notification_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Notification" />
+
+    </LinearLayout>
+
+    <!-- Notification Pop-up -->
+    <RelativeLayout
+        android:id="@+id/notification_popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/notification_background"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/notification_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notification: Cheese is low in stock"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:id="@+id/mark_as_seen_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/notification_text"
+            android:layout_marginTop="8dp"
+            android:text="Mark as seen" />
+    </RelativeLayout>
+
+</RelativeLayout>
