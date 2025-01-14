@@ -1,21 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeScreen">
+    android:orientation="vertical"
+    android:id="@+id/main">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="THIS IS THE HOME SCREEN"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Search Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="8dp">
+
+            <EditText
+                android:id="@+id/search_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Search Item"
+                android:padding="8dp"
+                android:background="@android:drawable/edit_text"
+                android:inputType="text" />
+
+            <ImageButton
+                android:id="@+id/search_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_search"
+                android:contentDescription="Search"
+                android:background="@null" />
+        </LinearLayout>
+
+        <!-- Dashboard Button -->
+        <Button
+            android:id="@+id/dashboard_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="Dashboard" />
+
+        <!-- Table Layout -->
+        <TableLayout
+            android:id="@+id/inventory_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"
+            android:padding="8dp">
+
+            <!-- Header Row -->
+            <TableRow>
+                <TextView android:text="Action" android:padding="8dp" android:textStyle="bold" />
+                <TextView android:text="Item Name" android:padding="8dp" android:textStyle="bold" />
+                <TextView android:text="Item ID" android:padding="8dp" android:textStyle="bold" />
+                <TextView android:text="Expiry Date" android:padding="8dp" android:textStyle="bold" />
+            </TableRow>
+
+            <!-- Data Rows -->
+            <TableRow>
+                <ImageButton android:src="@android:drawable/ic_menu_edit" android:contentDescription="Edit" android:background="@null" android:padding="8dp" />
+                <TextView android:text="Tomato" android:padding="8dp" />
+                <TextView android:text="01" android:padding="8dp" />
+                <TextView android:text="Jun 10, 2024" android:padding="8dp" />
+            </TableRow>
+
+            <TableRow>
+                <ImageButton android:src="@android:drawable/ic_menu_edit" android:contentDescription="Edit" android:background="@null" android:padding="8dp" />
+                <TextView android:text="Milk" android:padding="8dp" />
+                <TextView android:text="02" android:padding="8dp" />
+                <TextView android:text="Jun 10, 2024" android:padding="8dp" />
+            </TableRow>
+
+            <!-- Add more rows as needed -->
+
+        </TableLayout>
+
+    </LinearLayout>
+
+</ScrollView>
