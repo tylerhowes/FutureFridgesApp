@@ -27,46 +27,42 @@ public class OrdersActivity extends AppCompatActivity {
 
         TableLayout tableLayout = findViewById(R.id.ordersTable);
 
+        ArrayList<FridgeItem> items = new ArrayList<>();
+        items.add(new FridgeItem("Cheese", "01", "Jun 10, 2024", 1) );
+
         // Example list of orders
         List<Order> orders = new ArrayList<>();
-        orders.add(new Order("01", "X", getString(R.string.completed)));
-        orders.add(new Order("02", "Y", getString(R.string.pending)));
-        orders.add(new Order("03", "Z", getString(R.string.completed)));
-        orders.add(new Order("04", "W", getString(R.string.pending)));
-        orders.add(new Order("05", "S", getString(R.string.completed)));
+        orders.add(new Order("01", "X", getString(R.string.completed), items));
+
 
         // Populate the table
         for (Order order : orders) {
             TableRow row = new TableRow(this);
-            row.setBackgroundResource(R.drawable.border);
 
             // Order ID
             TextView orderIdView = new TextView(this);
             orderIdView.setText(order.getId());
             orderIdView.setGravity(Gravity.CENTER);
             orderIdView.setPadding(16, 16, 16, 16);
-            orderIdView.setBackgroundResource(R.drawable.border);
 
             // Supplier
             TextView supplierView = new TextView(this);
             supplierView.setText(order.getSupplier());
             supplierView.setGravity(Gravity.CENTER);
             supplierView.setPadding(16, 16, 16, 16);
-            supplierView.setBackgroundResource(R.drawable.border);
+
 
             // Status
             TextView statusView = new TextView(this);
             statusView.setText(order.getStatus());
             statusView.setGravity(Gravity.CENTER);
             statusView.setPadding(16, 16, 16, 16);
-            statusView.setBackgroundResource(R.drawable.border);
 
             // Action
-            TextView actionView = new TextView(this);
+            Button actionView = new Button(this);
             actionView.setText(getString(R.string.edit));
             actionView.setGravity(Gravity.CENTER);
             actionView.setPadding(16, 16, 16, 16);
-            actionView.setBackgroundResource(R.drawable.border);
 
             // Add all views to the row
             row.addView(orderIdView);
