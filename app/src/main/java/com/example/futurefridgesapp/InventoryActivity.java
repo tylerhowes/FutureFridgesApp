@@ -102,11 +102,11 @@ public class InventoryActivity extends AppCompatActivity {
             TableRow row = new TableRow(this);
 
             ImageButton plusButton = new ImageButton(this);
-            plusButton.setImageResource(android.R.drawable.ic_menu_add);
+            plusButton.setImageResource(R.drawable.baseline_plus_one_24);
             plusButton.setOnClickListener(v -> updateItemQuantity(item, item.getQuantity() + 1));
 
             ImageButton minusButton = new ImageButton(this);
-            minusButton.setImageResource(android.R.drawable.ic_menu_revert);
+            minusButton.setImageResource(R.drawable.baseline_exposure_neg_1_24);
             minusButton.setOnClickListener(v -> updateItemQuantity(item, item.getQuantity() - 1));
 
             TextView nameView = new TextView(this);
