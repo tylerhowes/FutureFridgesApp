@@ -11,4 +11,13 @@
     <string name="edit">Edit</string>
     <string name="completed">Completed</string>
     <string name="pending">Pending</string>
+    <string name="low_stock_title">Low Stock</string>
+    <string name="low_stock_cheese">Cheese is low in stock.</string>
+    <string name="low_stock_tomato">Tomato is low in stock.</string>
+    <string name="expiry_date_title">Expiry Date Approaching</string>
+    <string name="expiry_date_eggs">Eggs are expiring soon.</string>
+    <string name="mark_as_resolved">Mark as resolved</string>
+    <string name="see_date">See date</string>
+    <string name="close_icon">✖</string>
+    <string name="notification_scroll_description">Scrollable list of notifications</string>
 </resources>
