@@ -49,7 +49,7 @@ public class InventoryManager {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()){
                     for (QueryDocumentSnapshot document : task.getResult()){
-                        addItem(document.getString("name"), document.getId(), document.getString("expiry"), Integer.parseInt(document.getString("quantity")));
+                        addItem(document.getString("name"), document.getId(), document.getString("expiry"), Integer.valueOf(document.get("quantity").toString()));
                     }
                 } else{
                     Log.d("InventoryManager", "Error getting Inventory document: ", task.getException());
