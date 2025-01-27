@@ -20,4 +20,10 @@
     <string name="see_date">See date</string>
     <string name="close_icon">✖</string>
     <string name="notification_scroll_description">Scrollable list of notifications</string>
+    <string name="back_icon_description">Go back</string>
+    <string name="profile_icon_description">Profile</string>
+    <string name="delivery_id">Delivery ID</string>
+    <string name="delivery_id_hint">Enter Delivery ID</string>
+    <string name="confirm_delivery">Confirm delivery</string>
+    <string name="log_out">Log out</string>
 </resources>
