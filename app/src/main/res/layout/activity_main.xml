@@ -9,12 +9,11 @@
 
 
     <EditText
-        android:id="@+id/emailText"
+        android:id="@+id/passcodeText"
         android:layout_width="210dp"
         android:layout_height="wrap_content"
-        android:hint="Email"
-        android:inputType="text"
-
+        android:hint="Passcode"
+        android:inputType="number"
         android:textAlignment="center"
 
         app:layout_constraintBottom_toBottomOf="parent"
@@ -23,22 +22,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.276" />
-
-    <EditText
-        android:id="@+id/passwordText"
-        android:layout_width="210dp"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-
-        android:textAlignment="center"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.402" />
 
     <Button
         android:id="@+id/buttonLogin"

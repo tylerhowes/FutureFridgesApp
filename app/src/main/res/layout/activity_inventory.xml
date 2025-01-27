@@ -44,9 +44,11 @@
             android:id="@+id/dashboard_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="Dashboard" />
+            android:layout_gravity="center"
+            android:text="Dashboard"
+            />
 
+        
         <!-- Table Layout -->
         <TableLayout
             android:id="@+id/inventory_table"
@@ -55,30 +57,7 @@
             android:stretchColumns="*"
             android:padding="8dp">
 
-            <!-- Header Row -->
-            <TableRow>
-                <TextView android:text="Action" android:padding="8dp" android:textStyle="bold" />
-                <TextView android:text="Item Name" android:padding="8dp" android:textStyle="bold" />
-                <TextView android:text="Item ID" android:padding="8dp" android:textStyle="bold" />
-                <TextView android:text="Expiry Date" android:padding="8dp" android:textStyle="bold" />
-            </TableRow>
-
-            <!-- Data Rows -->
-            <TableRow>
-                <ImageButton android:src="@android:drawable/ic_menu_edit" android:contentDescription="Edit" android:background="@null" android:padding="8dp" />
-                <TextView android:text="Tomato" android:padding="8dp" />
-                <TextView android:text="01" android:padding="8dp" />
-                <TextView android:text="Jun 10, 2024" android:padding="8dp" />
-            </TableRow>
-
-            <TableRow>
-                <ImageButton android:src="@android:drawable/ic_menu_edit" android:contentDescription="Edit" android:background="@null" android:padding="8dp" />
-                <TextView android:text="Milk" android:padding="8dp" />
-                <TextView android:text="02" android:padding="8dp" />
-                <TextView android:text="Jun 10, 2024" android:padding="8dp" />
-            </TableRow>
-
-            <!-- Add more rows as needed -->
+            <!--Rows created programmatically see Inventory Activity-->
 
         </TableLayout>
 

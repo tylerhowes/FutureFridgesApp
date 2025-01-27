@@ -1,8 +1,10 @@
 package com.example.futurefridgesapp;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,6 +32,16 @@ public class NotificationActivity extends AppCompatActivity {
             LinearLayout card = createNotificationCard(notification, notificationContainer);
             notificationContainer.addView(card); // Add the card to the container
         }
+
+        Button dashboardButton = findViewById(R.id.dashboardButton);
+        dashboardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(NotificationActivity.this, DashboardActivity.class);
+
+                startActivity(intent);
+            }
+        });
     }
 
     /**

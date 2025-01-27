@@ -1,32 +1,39 @@
 package com.example.futurefridgesapp;
 
-public class FridgeItem {
-    private String name;
-    private String expiryDate;
-    private String quantity;
-    private String id;
 
-    public FridgeItem(String name, String expiryDate, String quantity, String id) {
+
+public class FridgeItem {
+
+    private final String name;
+    private final String id;
+    private final String expiry;
+    private int quantity;
+
+    public FridgeItem(String name, String id, String expiry, int quantity) {
         this.name = name;
-        this.expiryDate = expiryDate;
-        this.quantity = quantity;
         this.id = id;
+        this.expiry = expiry;
+        this.quantity = quantity;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getExpiryDate() {
-        return expiryDate;
+    public String getId() {
+        return id;
     }
 
-    public String getQuantity() {
+    public String getExpiry() {
+        return expiry;
+    }
+
+    public int getQuantity() {
         return quantity;
     }
 
-    public String getId() {
-        return id;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
 }
