@@ -28,6 +28,10 @@ public class InventoryManager {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
+    public InventoryManager(){
+
+    }
+
     public InventoryManager(TableLayout tableLayout, ArrayList<FridgeItem> itemList){
         this.tableLayout = tableLayout;
         this.itemList = itemList;
@@ -126,6 +130,23 @@ public class InventoryManager {
             row.addView(deleteButton);
 
             tableLayout.addView(row);
+        }
+    }
+
+    public void addOrder(List<FridgeItem> orderItems){
+        for(FridgeItem item : orderItems){
+
+            db.collection("Inventory").document(item.getId()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()){
+                        DocumentSnapshot docSnapshot = task.getResult();
+                        int oldQuantity = docSnapshot.getLong("quantity").intValue();
+                        item.setQuantity(oldQuantity+1);
+                        db.collection("Inventory").document(item.getId()).set(item);
+                    }
+                }
+            });
         }
     }
 
