@@ -6,11 +6,13 @@ import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,8 +28,8 @@ public class InventoryManager {
     private TableLayout tableLayout;
     private ArrayList<FridgeItem> itemList;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
+    private String userRole;
     public InventoryManager(){
 
     }
@@ -36,18 +38,30 @@ public class InventoryManager {
         this.tableLayout = tableLayout;
         this.itemList = itemList;
 
+        db.collection("Users").document(auth.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot snapshot = task.getResult();
+                    if(snapshot != null) {
+
+                        userRole = snapshot.getString("role");
+
+                    } else{
+
+                        Log.e("Firestore", "Error fetching documents: ", task.getException());
+                    }
+                }
+                else {
+                    Log.e("Firestore", "Error fetching documents: ", task.getException());
+
+                }
+            }
+        });
+
     }
 
     public void loadInitialItems() {
-    //        addItem("Tomato", "01", "Jun 10, 2024", 1);
-    //        addItem("Milk", "02", "Jun 10, 2024", 1);
-    //        addItem("Chicken", "03", "Jun 10, 2024", 1);
-    //        addItem("Broth", "04", "Jun 10, 2024", 1);
-    //        addItem("Chillies", "05", "Jun 10, 2024", 1);
-    //        addItem("Salmon", "06", "Jun 10, 2024", 1);
-    //        addItem("Cod", "07", "Jun 10, 2024", 1);
-
-
         db.collection("Inventory").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -94,42 +108,66 @@ public class InventoryManager {
     private void refreshTable(List<FridgeItem> items) {
         tableLayout.removeAllViews();
 
+        Log.d("INVENTORY MANAGE", "Role signing in: " + userRole);
         for (FridgeItem item : items) {
-            TableRow row = new TableRow(tableLayout.getContext());
+            if(userRole.equals("headchef")){
+                TableRow row = new TableRow(tableLayout.getContext());
 
-            ImageButton plusButton = new ImageButton(tableLayout.getContext());
-            plusButton.setImageResource(R.drawable.baseline_plus_one_24);
-            plusButton.setOnClickListener(v -> updateItemQuantity(item, item.getQuantity() + 1));
+                ImageButton plusButton = new ImageButton(tableLayout.getContext());
+                plusButton.setImageResource(R.drawable.baseline_plus_one_24);
+                plusButton.setOnClickListener(v -> updateItemQuantity(item, item.getQuantity() + 1));
 
-            ImageButton minusButton = new ImageButton(tableLayout.getContext());
-            minusButton.setImageResource(R.drawable.baseline_exposure_neg_1_24);
-            minusButton.setOnClickListener(v -> updateItemQuantity(item, item.getQuantity() - 1));
+                ImageButton minusButton = new ImageButton(tableLayout.getContext());
+                minusButton.setImageResource(R.drawable.baseline_exposure_neg_1_24);
+                minusButton.setOnClickListener(v -> updateItemQuantity(item, item.getQuantity() - 1));
 
-            TextView nameView = new TextView(tableLayout.getContext());
-            nameView.setText(item.getName());
+                TextView nameView = new TextView(tableLayout.getContext());
+                nameView.setText(item.getName());
 
-//            TextView idView = new TextView(tableLayout.getContext());
-//            idView.setText(item.getId());
+                TextView expiryView = new TextView(tableLayout.getContext());
+                expiryView.setText(item.getExpiry());
 
-            TextView expiryView = new TextView(tableLayout.getContext());
-            expiryView.setText(item.getExpiry());
+                TextView quantityView = new TextView(tableLayout.getContext());
+                quantityView.setText(String.valueOf(item.getQuantity()));
 
-            TextView quantityView = new TextView(tableLayout.getContext());
-            quantityView.setText(String.valueOf(item.getQuantity()));
+                Button deleteButton = new Button(tableLayout.getContext());
+                deleteButton.setText("Delete");
+                deleteButton.setOnClickListener(v -> removeItem(item));
 
-            Button deleteButton = new Button(tableLayout.getContext());
-            deleteButton.setText("Delete");
-            deleteButton.setOnClickListener(v -> removeItem(item));
+                row.addView(minusButton);
+                row.addView(plusButton);
+                row.addView(nameView);
+                row.addView(expiryView);
+                row.addView(quantityView);
+                row.addView(deleteButton);
+                tableLayout.addView(row);
+            }
+            else{
+                TableRow row = new TableRow(tableLayout.getContext());
 
-            row.addView(plusButton);
-            row.addView(minusButton);
-            row.addView(nameView);
-//            row.addView(idView);
-            row.addView(expiryView);
-            row.addView(quantityView);
-            row.addView(deleteButton);
+                ImageButton minusButton = new ImageButton(tableLayout.getContext());
+                minusButton.setImageResource(R.drawable.baseline_exposure_neg_1_24);
+                minusButton.setOnClickListener(v -> updateItemQuantity(item, item.getQuantity() - 1));
 
-            tableLayout.addView(row);
+                TextView nameView = new TextView(tableLayout.getContext());
+                nameView.setText(item.getName());
+
+                TextView expiryView = new TextView(tableLayout.getContext());
+                expiryView.setText(item.getExpiry());
+
+                TextView quantityView = new TextView(tableLayout.getContext());
+                quantityView.setText(String.valueOf(item.getQuantity()));
+
+
+                row.addView(nameView);
+                row.addView(expiryView);
+                row.addView(quantityView);
+                row.addView(minusButton);
+
+                tableLayout.addView(row);
+            }
+
+
         }
     }
 
