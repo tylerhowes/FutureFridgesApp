@@ -58,16 +58,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void signIn(String email, String password){
+    private void signIn(String email, String password, String role){
 
-        Intent signInIntent = new Intent(this, DashboardActivity.class);
+        Intent signInChefIntent = new Intent(this, DashboardActivity.class);
+        Intent signInDeliveryIntent = new Intent(this, DeliveryActivity.class);
 
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(authTask -> {
             if(authTask.isSuccessful()){
                 FirebaseUser user = auth.getCurrentUser();
                 if(user != null){
-                    Log.d("Login", "Logged in as: " + user.getEmail());
-                    startActivity(signInIntent);
+                    if(role.equals("chef")){
+                        Log.d("Login", "Logged in as: " + user.getEmail());
+                        startActivity(signInChefIntent);
+                    } else if (role.equals("delivery")) {
+                        Log.d("Login", "Logged in as: " + user.getEmail());
+                        startActivity(signInDeliveryIntent);
+                    }
+
                 }
                 else {
                     Log.e("Login", "Error: " + authTask.getException());
@@ -88,9 +95,10 @@ public class MainActivity extends AppCompatActivity {
 
                             String email = document.getString("email");
                             String password = document.getString("password");
+                            String role = document.getString("role");
 
-                            if (email != null && password != null) {
-                                signIn(email, password);
+                            if (email != null && password != null && role != null) {
+                                signIn(email, password, role);
                             } else {
                                 Toast.makeText(MainActivity.this, "Invalid user data", Toast.LENGTH_SHORT).show();
                             }
