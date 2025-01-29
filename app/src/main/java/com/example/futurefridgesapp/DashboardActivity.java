@@ -1,5 +1,7 @@
 package com.example.futurefridgesapp;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -53,8 +55,9 @@ public class DashboardActivity extends AppCompatActivity {
         // Navigation Buttons
         dashboardButton.setOnClickListener(v -> finish()); // Go back to the previous screen
         accountSettingsButton.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, AccountSettingsActivity.class);
+            Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
             startActivity(intent);
+            this.getSupportFragmentManager().popBackStack();
         });
 
         // Show the notification popup (simulate an alert, e.g., low stock)
