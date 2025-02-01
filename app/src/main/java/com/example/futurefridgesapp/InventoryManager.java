@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class InventoryManager {
 
@@ -60,8 +61,66 @@ public class InventoryManager {
         });
     }
 
+    private void checkExpiry(FridgeItem item){
+
+        String expiryDate = item.getExpiry();
+
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String currentDate = df.format(c);
+
+        int difference = (int) getDateDiff(df, currentDate, expiryDate);
+        Log.d("InventoryManager", "The difference in date is: " + difference + " Days");
+
+        if(difference <= 0){
+            NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification("Expiry Date", currentDate, item.getName() + " is expiring", "Expired");
+
+            db.collection("Notifications")
+                    .add(lowStockNotification)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + documentReference.getId());
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("Inventory Manager", "Error adding document", e);
+                        }
+                    });
+        }
+    }
+
+    public static long getDateDiff(SimpleDateFormat format, String oldDate, String newDate) {
+        try {
+            Date oldDateObject = new Date(format.parse(oldDate).getTime());
+            Date newDateObject = new Date(format.parse(newDate).getTime());
+
+            return TimeUnit.DAYS.convert(
+                    removeTime(newDateObject).getTime() - removeTime(oldDateObject).getTime(),
+                    TimeUnit.MILLISECONDS
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    public static Date removeTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
     private void addItem(String name, String id, String expiry, int quantity) {
         FridgeItem newItem = new FridgeItem(name, id, expiry, quantity);
+        checkExpiry(newItem);
         itemList.add(newItem);
         refreshTable(itemList);
     }
@@ -79,7 +138,7 @@ public class InventoryManager {
         }
         if(quantity <= 3 && (quantity+1 != 0)){
             Date c = Calendar.getInstance().getTime();
-            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             String formattedDate = df.format(c);
             Log.d("Inventory Manager", "Date: " + formattedDate);
             NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification("Low Stock", formattedDate, item.getName() + " is low on stock", "Low Stock");
