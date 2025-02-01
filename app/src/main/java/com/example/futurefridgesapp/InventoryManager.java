@@ -11,6 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -20,45 +22,27 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class InventoryManager {
 
     private TableLayout tableLayout;
     private ArrayList<FridgeItem> itemList;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseAuth auth = FirebaseAuth.getInstance();
     private String userRole;
     public InventoryManager(){
 
     }
 
-    public InventoryManager(TableLayout tableLayout, ArrayList<FridgeItem> itemList){
+    public InventoryManager(TableLayout tableLayout, ArrayList<FridgeItem> itemList, String userRole){
         this.tableLayout = tableLayout;
         this.itemList = itemList;
-
-        db.collection("Users").document(auth.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    DocumentSnapshot snapshot = task.getResult();
-                    if(snapshot != null) {
-
-                        userRole = snapshot.getString("role");
-
-                    } else{
-
-                        Log.e("Firestore", "Error fetching documents: ", task.getException());
-                    }
-                }
-                else {
-                    Log.e("Firestore", "Error fetching documents: ", task.getException());
-
-                }
-            }
-        });
-
+        this.userRole = userRole;
     }
 
     public void loadInitialItems() {
@@ -92,6 +76,28 @@ public class InventoryManager {
             item.setQuantity(quantity);
             db.collection("Inventory").document(item.getId()).set(item);
             refreshTable(itemList);
+        }
+        if(quantity <= 3 && (quantity+1 != 0)){
+            Date c = Calendar.getInstance().getTime();
+            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+            String formattedDate = df.format(c);
+            Log.d("Inventory Manager", "Date: " + formattedDate);
+            NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification("Low Stock", formattedDate, item.getName() + " is low on stock", "Low Stock");
+
+            db.collection("Notifications")
+                    .add(lowStockNotification)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + documentReference.getId());
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("Inventory Manager", "Error adding document", e);
+                        }
+                    });
         }
     }
 

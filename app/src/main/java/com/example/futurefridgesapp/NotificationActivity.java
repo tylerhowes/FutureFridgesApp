@@ -3,15 +3,27 @@ package com.example.futurefridgesapp;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+
 public class NotificationActivity extends AppCompatActivity {
+
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,28 +32,44 @@ public class NotificationActivity extends AppCompatActivity {
 
         LinearLayout notificationContainer = findViewById(R.id.notificationContainer);
 
-        // Example data for notifications
-        Notification[] notifications = new Notification[]{
-                new Notification(getString(R.string.low_stock_title), getString(R.string.low_stock_cheese), getString(R.string.mark_as_resolved)),
-                new Notification(getString(R.string.low_stock_title), getString(R.string.low_stock_tomato), getString(R.string.mark_as_resolved)),
-                new Notification(getString(R.string.expiry_date_title), getString(R.string.expiry_date_eggs), getString(R.string.see_date))
-        };
+        ArrayList<Notification> notificationArrayList = new ArrayList<Notification>();
 
-        // Add cards dynamically
-        for (Notification notification : notifications) {
-            LinearLayout card = createNotificationCard(notification, notificationContainer);
-            notificationContainer.addView(card); // Add the card to the container
-        }
-
-        Button dashboardButton = findViewById(R.id.dashboardButton);
-        dashboardButton.setOnClickListener(new View.OnClickListener() {
+        db.collection("Notifications").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(NotificationActivity.this, DashboardActivity.class);
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for (QueryDocumentSnapshot document : task.getResult()){
+                        Notification notification = new Notification(document.getString("title"), document.getString("date"), document.getString("message"), document.getString("action"));
+                        notificationArrayList.add(notification);
 
-                startActivity(intent);
+                    }
+
+                    // Add cards dynamically
+                    for (Notification notif : notificationArrayList) {
+                        LinearLayout card = createNotificationCard(notif, notificationContainer);
+                        notificationContainer.addView(card); // Add the card to the container
+                    }
+
+                    Button dashboardButton = findViewById(R.id.dashboardButton);
+                    dashboardButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(NotificationActivity.this, DashboardActivity.class);
+
+                            startActivity(intent);
+                        }
+                    });
+
+                } else{
+                    Log.d("InventoryManager", "Error getting Inventory document: ", task.getException());
+                }
             }
         });
+
+
+
+
+
     }
 
     /**
@@ -56,7 +84,7 @@ public class NotificationActivity extends AppCompatActivity {
         LinearLayout card = createCardContainer();
 
         // Add the header (title and close icon)
-        card.addView(createCardHeader(notification.getTitle(), container, card));
+        card.addView(createCardHeader(notification.getTitle(), notification.getDate(), container, card));
 
         // Add the message
         card.addView(createCardMessage(notification.getMessage()));
@@ -94,7 +122,7 @@ public class NotificationActivity extends AppCompatActivity {
      * @param card      The card to remove when the close icon is clicked.
      * @return A LinearLayout representing the card header.
      */
-    private LinearLayout createCardHeader(String titleText, LinearLayout container, LinearLayout card) {
+    private LinearLayout createCardHeader(String titleText, String date, LinearLayout container, LinearLayout card) {
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setLayoutParams(new LinearLayout.LayoutParams(
@@ -102,10 +130,23 @@ public class NotificationActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
 
+        TextView dateTV = new TextView(this);
+        dateTV.setText(date);
+        dateTV.setTextSize(16);
+        dateTV.setTextColor(Color.DKGRAY);
+        dateTV.setLayoutParams(new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
+        ));
+        header.addView(dateTV);
+
+
         TextView title = new TextView(this);
         title.setText(titleText);
         title.setTextSize(16);
         title.setTextColor(Color.BLACK);
+        title.setGravity(Gravity.CENTER);
         title.setLayoutParams(new LinearLayout.LayoutParams(
                 0,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -113,11 +154,18 @@ public class NotificationActivity extends AppCompatActivity {
         ));
         header.addView(title);
 
+
+
         TextView closeIcon = new TextView(this);
         closeIcon.setText("✖");
         closeIcon.setGravity(Gravity.END);
         closeIcon.setTextSize(18);
         closeIcon.setTextColor(Color.RED);
+        closeIcon.setLayoutParams(new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
+        ));;
         closeIcon.setOnClickListener(v -> container.removeView(card));
         header.addView(closeIcon);
 
@@ -133,6 +181,7 @@ public class NotificationActivity extends AppCompatActivity {
     private TextView createCardMessage(String messageText) {
         TextView message = new TextView(this);
         message.setText(messageText);
+        message.setGravity(Gravity.CENTER);
         message.setTextColor(Color.DKGRAY);
         message.setPadding(0, 8, 0, 8);
         return message;
@@ -161,13 +210,20 @@ public class NotificationActivity extends AppCompatActivity {
     // Notification model class
     static class Notification {
         private final String title;
+        private final String date;
         private final String message;
         private final String action;
 
-        public Notification(String title, String message, String action) {
+        public Notification(String title, String date, String message, String action) {
             this.title = title;
+            this.date = date;
             this.message = message;
             this.action = action;
+        }
+
+        public String getDate()
+        {
+            return date;
         }
 
         public String getTitle() {

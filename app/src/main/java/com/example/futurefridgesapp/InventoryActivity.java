@@ -42,7 +42,10 @@ public class InventoryActivity extends AppCompatActivity {
         inventoryTable = findViewById(R.id.inventory_table);
         searchField = findViewById(R.id.search_item);
 
-        inventoryManager = new InventoryManager(inventoryTable, itemList);
+        Intent dashIntent = getIntent();
+        String userRole = dashIntent.getStringExtra("userRole");
+
+        inventoryManager = new InventoryManager(inventoryTable, itemList, userRole);
 
         Button dashboardButton = findViewById(R.id.dashboard_button);
         dashboardButton.setOnClickListener(v -> {
