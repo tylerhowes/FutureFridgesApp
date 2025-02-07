@@ -25,7 +25,6 @@ public class DashboardActivity extends AppCompatActivity {
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     private String userRole;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +55,8 @@ public class DashboardActivity extends AppCompatActivity {
         // Quick Access Buttons
         Button inventoryButton = findViewById(R.id.inventory_button);
         Button ordersButton = findViewById(R.id.orders_button);
-        Button fridgesButton = findViewById(R.id.fridges_button);
         Button notificationButton = findViewById(R.id.notification_button);
+        Button addNewStockButton = findViewById(R.id.add_new_stock_button);
 
         // Navigation Buttons
         ImageButton dashboardButton = findViewById(R.id.dashboard_button);
@@ -79,13 +78,13 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        fridgesButton.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, FridgesActivity.class);
+        notificationButton.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, NotificationActivity.class);
             startActivity(intent);
         });
 
-        notificationButton.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, NotificationActivity.class);
+        addNewStockButton.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, AddNewItemActivity.class);
             startActivity(intent);
         });
 
@@ -95,6 +94,8 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
             this.getSupportFragmentManager().popBackStack();
         });
+
+
 
         // Show the notification popup (simulate an alert, e.g., low stock)
         // This could be replaced by actual logic when integrating notifications.

@@ -8,12 +8,18 @@ public class FridgeItem {
     private final String id;
     private final String expiry;
     private int quantity;
+    private final String dateAdded;
 
-    public FridgeItem(String name, String id, String expiry, int quantity) {
+    public FridgeItem(String name, String id, String expiry, int quantity, String dateAdded) {
         this.name = name;
         this.id = id;
         this.expiry = expiry;
         this.quantity = quantity;
+        this.dateAdded = dateAdded;
+    }
+
+    public String getDateAdded() {
+        return dateAdded;
     }
 
     public String getName() {

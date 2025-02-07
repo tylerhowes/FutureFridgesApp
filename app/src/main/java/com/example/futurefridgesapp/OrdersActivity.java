@@ -43,7 +43,7 @@ public class OrdersActivity extends AppCompatActivity {
         TableLayout tableLayout = findViewById(R.id.ordersTable);
 
         ArrayList<FridgeItem> items = new ArrayList<>();
-        items.add(new FridgeItem("Cheese", "01", "Jun 10, 2024", 1) );
+        items.add(new FridgeItem("Cheese", "01", "Jun 10, 2024", 1, "25/01/2025") );
 
         // Example list of orders
         ArrayList<Order> orders = new ArrayList<>();
@@ -76,8 +76,9 @@ public class OrdersActivity extends AppCompatActivity {
                                             String id = itemSnapshot.getString("id");
                                             String expiry = itemSnapshot.getString("expiry");
                                             int quantity = itemSnapshot.getLong("quantity").intValue();
+                                            String dateAdded = itemSnapshot.getString("dateAdded");
 
-                                            FridgeItem fridgeItem = new FridgeItem(name, id, expiry, quantity);
+                                            FridgeItem fridgeItem = new FridgeItem(name, id, expiry, quantity, dateAdded);
                                             items.add(fridgeItem);
 
                                             Log.d("DeliveryActivity", "Item: " + fridgeItem.toString());
