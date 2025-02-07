@@ -76,7 +76,11 @@ public class MainActivity extends AppCompatActivity {
                     } else if(role.equals("headchef")){
                         Log.d("Login", "Logged in as: " + user.getEmail());
                         startActivity(signInChefIntent);
-                    } else{
+                    } else if(role.equals("admin")) {
+                        Log.d("Login", "Logged in as: " + user.getEmail());
+                        startActivity(signInChefIntent);
+                    }
+                    else{
                         Toast.makeText(this, "No User Role Found", Toast.LENGTH_SHORT);
                     }
 
