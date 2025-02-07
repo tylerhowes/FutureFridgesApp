@@ -244,7 +244,7 @@ public class InventoryManager {
 
         Log.d("INVENTORY MANAGE", "Role signing in: " + userRole);
         for (FridgeItem item : items) {
-            if(userRole.equals("headchef")){
+            if(userRole.equals("headchef") || userRole.equals("admin")){
                 TableRow row = new TableRow(tableLayout.getContext());
 
                 ImageButton plusButton = new ImageButton(tableLayout.getContext());

@@ -30,6 +30,14 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        // Quick Access Buttons
+        Button inventoryButton = findViewById(R.id.inventory_button);
+        Button ordersButton = findViewById(R.id.orders_button);
+        Button notificationButton = findViewById(R.id.notification_button);
+        Button addNewStockButton = findViewById(R.id.add_new_stock_button);
+        Button addNewUserButton = findViewById(R.id.add_user_button);
+
+
         //get user role
         db.collection("Users").document(auth.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -39,7 +47,24 @@ public class DashboardActivity extends AppCompatActivity {
                     if(snapshot != null) {
 
                         userRole = snapshot.getString("role");
+                        switch(userRole){
+                            case "chef":
+                                ordersButton.setVisibility(View.GONE);
+                                notificationButton.setVisibility(View.GONE);
+                                addNewUserButton.setVisibility(View.GONE);
+                                addNewStockButton.setVisibility(View.GONE);
 
+                            case "headchef":
+                                addNewUserButton.setVisibility(View.GONE);
+                                addNewStockButton.setVisibility(View.GONE);
+
+                            case "admin":
+
+
+                                //chef
+                                //headchef
+                                //admin
+                        }
                     } else{
 
                         Log.e("Firestore", "Error fetching documents: ", task.getException());
@@ -52,11 +77,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        // Quick Access Buttons
-        Button inventoryButton = findViewById(R.id.inventory_button);
-        Button ordersButton = findViewById(R.id.orders_button);
-        Button notificationButton = findViewById(R.id.notification_button);
-        Button addNewStockButton = findViewById(R.id.add_new_stock_button);
+
 
         // Navigation Buttons
         ImageButton dashboardButton = findViewById(R.id.dashboard_button);
@@ -88,14 +109,17 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        addNewStockButton.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, AddNewItemActivity.class);
+            startActivity(intent);
+        });
+
         // Navigation Buttons
         dashboardButton.setOnClickListener(v -> {
             Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
             startActivity(intent);
             this.getSupportFragmentManager().popBackStack();
         });
-
-
 
         // Show the notification popup (simulate an alert, e.g., low stock)
         // This could be replaced by actual logic when integrating notifications.
