@@ -64,17 +64,25 @@
             android:layout_marginBottom="8dp" />
 
         <Button
-            android:id="@+id/fridges_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fridges"
-            android:layout_marginBottom="8dp" />
-
-        <Button
             android:id="@+id/notification_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Notification" />
+            android:text="Notifications"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/add_user_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add New User"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/add_new_stock_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add New Stock Item"
+            android:layout_marginBottom="8dp" />
 
     </LinearLayout>
 

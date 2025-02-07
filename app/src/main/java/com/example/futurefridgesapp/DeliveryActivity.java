@@ -68,8 +68,9 @@ public class DeliveryActivity extends AppCompatActivity {
                                                     String id = itemSnapshot.getString("id");
                                                     String expiry = itemSnapshot.getString("expiry");
                                                     int quantity = itemSnapshot.getLong("quantity").intValue();
+                                                    String dateAdded = itemSnapshot.getString("dateAdded");
 
-                                                    FridgeItem fridgeItem = new FridgeItem(name, id, expiry, quantity);
+                                                    FridgeItem fridgeItem = new FridgeItem(name, id, expiry, quantity, dateAdded);
 
                                                     items.add(fridgeItem);
 

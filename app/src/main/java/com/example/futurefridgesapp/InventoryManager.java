@@ -20,6 +20,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,6 +37,7 @@ public class InventoryManager {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String userRole;
     boolean addingItem = false;
+
     public InventoryManager(){
 
     }
@@ -51,13 +54,30 @@ public class InventoryManager {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()){
                     for (QueryDocumentSnapshot document : task.getResult()){
-                        addItem(document.getString("name"), document.getId(), document.getString("expiry"), Integer.valueOf(document.get("quantity").toString()));
+                        int expiry = Integer.parseInt(document.getString("expiry"));
+                        String dateAdded = document.getString("dateAdded");
+
+                        String expiryDate = calculateExpiry(dateAdded, expiry);
+
+                        addItem(document.getString("name"), document.getId(), expiryDate, Integer.valueOf(document.get("quantity").toString()), document.getString("dateAdded"));
                     }
                 } else{
                     Log.d("InventoryManager", "Error getting Inventory document: ", task.getException());
                 }
             }
         });
+    }
+
+    private String calculateExpiry(String dateAdded, int numberOfDays){
+        DateTimeFormatter formatter = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            LocalDate addedDate = LocalDate.parse(dateAdded, formatter); // Convert dateAdded string to LocalDate
+            LocalDate expiryDate = addedDate.plusDays(numberOfDays); // Add expiry days
+            return expiryDate.format(formatter);
+        }
+        return "00/00/0000";
     }
 
     private void checkExpiry(FridgeItem item){
@@ -117,8 +137,8 @@ public class InventoryManager {
         return cal.getTime();
     }
 
-    private void addItem(String name, String id, String expiry, int quantity) {
-        FridgeItem newItem = new FridgeItem(name, id, expiry, quantity);
+    private void addItem(String name, String id, String expiry, int quantity, String dateAdded) {
+        FridgeItem newItem = new FridgeItem(name, id, expiry, quantity, dateAdded);
         checkExpiry(newItem);
         itemList.add(newItem);
         refreshTable(itemList);
