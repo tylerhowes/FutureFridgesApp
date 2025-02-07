@@ -6,59 +6,43 @@ import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class InventoryManager {
 
     private TableLayout tableLayout;
     private ArrayList<FridgeItem> itemList;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseAuth auth = FirebaseAuth.getInstance();
     private String userRole;
+    boolean addingItem = false;
     public InventoryManager(){
 
     }
 
-    public InventoryManager(TableLayout tableLayout, ArrayList<FridgeItem> itemList){
+    public InventoryManager(TableLayout tableLayout, ArrayList<FridgeItem> itemList, String userRole){
         this.tableLayout = tableLayout;
         this.itemList = itemList;
-
-        db.collection("Users").document(auth.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    DocumentSnapshot snapshot = task.getResult();
-                    if(snapshot != null) {
-
-                        userRole = snapshot.getString("role");
-
-                    } else{
-
-                        Log.e("Firestore", "Error fetching documents: ", task.getException());
-                    }
-                }
-                else {
-                    Log.e("Firestore", "Error fetching documents: ", task.getException());
-
-                }
-            }
-        });
-
+        this.userRole = userRole;
     }
 
     public void loadInitialItems() {
@@ -76,8 +60,66 @@ public class InventoryManager {
         });
     }
 
+    private void checkExpiry(FridgeItem item){
+
+        String expiryDate = item.getExpiry();
+
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String currentDate = df.format(c);
+
+        int difference = (int) getDateDiff(df, currentDate, expiryDate);
+        Log.d("InventoryManager", "The difference in date is: " + difference + " Days");
+
+        if(difference <= 0){
+            NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification("Expiry Date", currentDate, item.getName() + " is expiring", "Expired");
+
+            db.collection("Notifications")
+                    .add(lowStockNotification)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + documentReference.getId());
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("Inventory Manager", "Error adding document", e);
+                        }
+                    });
+        }
+    }
+
+    public static long getDateDiff(SimpleDateFormat format, String oldDate, String newDate) {
+        try {
+            Date oldDateObject = new Date(format.parse(oldDate).getTime());
+            Date newDateObject = new Date(format.parse(newDate).getTime());
+
+            return TimeUnit.DAYS.convert(
+                    removeTime(newDateObject).getTime() - removeTime(oldDateObject).getTime(),
+                    TimeUnit.MILLISECONDS
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    public static Date removeTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
     private void addItem(String name, String id, String expiry, int quantity) {
         FridgeItem newItem = new FridgeItem(name, id, expiry, quantity);
+        checkExpiry(newItem);
         itemList.add(newItem);
         refreshTable(itemList);
     }
@@ -92,6 +134,78 @@ public class InventoryManager {
             item.setQuantity(quantity);
             db.collection("Inventory").document(item.getId()).set(item);
             refreshTable(itemList);
+        }
+
+        if(!addingItem){
+            if(quantity <= 3 && (quantity+1 != 0)){
+
+                Date c = Calendar.getInstance().getTime();
+                SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                String formattedDate = df.format(c);
+                Log.d("Inventory Manager", "Date: " + formattedDate);
+                NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification("Low Stock", formattedDate, item.getName() + " is low on stock", "Low Stock");
+
+                db.collection("Notifications")
+                        .add(lowStockNotification)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + documentReference.getId());
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("Inventory Manager", "Error adding document", e);
+                            }
+                        });
+
+                db.collection("Orders").whereEqualTo("status", "Open").get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                    for (QueryDocumentSnapshot snap : task.getResult()) {
+                                        DocumentReference orderRef = snap.getReference();
+
+                                        // Get the existing item references list
+                                        List<DocumentReference> itemRefs = (List<DocumentReference>) snap.get("items");
+                                        if (itemRefs == null) {
+                                            itemRefs = new ArrayList<>();
+                                        }
+
+                                        // Reference to the FridgeItem document
+                                        DocumentReference fridgeItemRef = db.collection("Inventory").document(item.getId());
+
+                                        // Check if the item reference already exists
+                                        boolean exists = false;
+                                        for (DocumentReference existingRef : itemRefs) {
+                                            if (existingRef.getPath().equals(fridgeItemRef.getPath())) {
+                                                exists = true;
+                                                break;
+                                            }
+                                        }
+
+                                        // Append the item reference only if it does not already exist
+                                        if (!exists) {
+                                            itemRefs.add(fridgeItemRef);
+                                            orderRef.update("items", itemRefs)
+                                                    .addOnSuccessListener(aVoid ->
+                                                            Log.d("Firestore", "Item reference added successfully"))
+                                                    .addOnFailureListener(e ->
+                                                            Log.e("Firestore", "Error updating document", e));
+                                        } else {
+                                            Log.d("Firestore", "Item reference already exists in the array");
+                                        }
+                                    }
+                                } else {
+                                    Log.e("Firestore", "No open orders found or error fetching documents", task.getException());
+                                }
+                            }
+                        });
+                addingItem = false;
+
+            }
         }
     }
 
@@ -115,11 +229,17 @@ public class InventoryManager {
 
                 ImageButton plusButton = new ImageButton(tableLayout.getContext());
                 plusButton.setImageResource(R.drawable.baseline_plus_one_24);
-                plusButton.setOnClickListener(v -> updateItemQuantity(item, item.getQuantity() + 1));
+                plusButton.setOnClickListener(v -> {
+                    addingItem = true;
+                    updateItemQuantity(item, item.getQuantity() + 1);
+                });
 
                 ImageButton minusButton = new ImageButton(tableLayout.getContext());
                 minusButton.setImageResource(R.drawable.baseline_exposure_neg_1_24);
-                minusButton.setOnClickListener(v -> updateItemQuantity(item, item.getQuantity() - 1));
+                minusButton.setOnClickListener(v -> {
+                    addingItem = false;
+                    updateItemQuantity(item, item.getQuantity() - 1);
+                });
 
                 TextView nameView = new TextView(tableLayout.getContext());
                 nameView.setText(item.getName());
@@ -166,8 +286,6 @@ public class InventoryManager {
 
                 tableLayout.addView(row);
             }
-
-
         }
     }
 
@@ -187,5 +305,4 @@ public class InventoryManager {
             });
         }
     }
-
 }
