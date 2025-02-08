@@ -42,12 +42,8 @@ public class OrdersActivity extends AppCompatActivity {
         //Order Manager and Table
         TableLayout tableLayout = findViewById(R.id.ordersTable);
 
-        ArrayList<FridgeItem> items = new ArrayList<>();
-        //items.add(new FridgeItem("Cheese", "01", "Jun 10, 2024", 1, "25/01/2025") );
-
         // Example list of orders
         ArrayList<Order> orders = new ArrayList<>();
-        //orders.add(new Order("01", "test", "X", getString(R.string.completed), items));
 
         CollectionReference ordersRef = db.collection("Orders");
         ordersRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -73,13 +69,11 @@ public class OrdersActivity extends AppCompatActivity {
                                             DocumentSnapshot itemSnapshot = itemTask.getResult();
 
                                             String name = itemSnapshot.getString("name");
-                                            String itemId = itemSnapshot.getString("itemId");
-                                            String stockID = itemSnapshot.getString("stockId");
+                                            String stockID = itemRef.getId();
                                             String expiry = itemSnapshot.getString("expiry");
-                                            int quantity = Integer.valueOf(itemSnapshot.getLong("quantity").toString());
-                                            String dateAdded = itemSnapshot.getString("dateAdded");
+                                            int quantity = Integer.valueOf(itemSnapshot.getString("quantity"));
 
-                                            FridgeItem fridgeItem = new FridgeItem(name, itemId, stockID, expiry, quantity, dateAdded);
+                                            FridgeItem fridgeItem = new FridgeItem(name, null, stockID, expiry, quantity, null);
                                             items.add(fridgeItem);
 
                                             Log.d("OrdersActivity", "Item: " + fridgeItem.toString());
@@ -114,7 +108,7 @@ public class OrdersActivity extends AppCompatActivity {
             }
         });
 
-        orderManager = new OrderManager(tableLayout, orders);
+        orderManager = new OrderManager(tableLayout, orders, this);
 
 
         //Bottom buttons

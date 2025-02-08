@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -169,87 +170,60 @@ public class InventoryManager {
 
     private void updateItemQuantity(FridgeItem item, int quantity) {
         Log.d("InventoryManager", "Updating item: " + item.getItemId() + " to quantity " + quantity);
+
         if (quantity >= 0) {
             item.setQuantity(quantity);
             db.collection("Inventory").document(item.getItemId()).update("quantity", quantity);
             refreshTable(itemList);
         }
 
-        if(!addingItem){
-            if(quantity <= 3 && (quantity+1 != 0)){
-
+        if (!addingItem) {
+            if (quantity <= 3 && (quantity + 1 != 0)) {
                 Date c = Calendar.getInstance().getTime();
                 SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 String formattedDate = df.format(c);
                 Log.d("Inventory Manager", "Date: " + formattedDate);
-                NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification(null, "Low Stock", formattedDate, item.getName() + " is low on stock", "Low Stock");
+
+                NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification(
+                        null, "Low Stock", formattedDate, item.getName() + " is low on stock", "Low Stock"
+                );
 
                 db.collection("Notifications")
                         .add(lowStockNotification)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                String generatedId = documentReference.getId();
-                                Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + generatedId);
+                        .addOnSuccessListener(documentReference -> {
+                            String generatedId = documentReference.getId();
+                            Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + generatedId);
 
-                                // Update the Firestore document with its generated ID
-                                documentReference.update("id", generatedId)
-                                        .addOnSuccessListener(aVoid -> Log.d("Inventory Manager", "Notification updated with ID"))
-                                        .addOnFailureListener(e -> Log.w("Inventory Manager", "Error updating document with ID", e));
-                            }
+                            documentReference.update("id", generatedId)
+                                    .addOnSuccessListener(aVoid -> Log.d("Inventory Manager", "Notification updated with ID"))
+                                    .addOnFailureListener(e -> Log.w("Inventory Manager", "Error updating document with ID", e));
                         })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("Inventory Manager", "Error adding document", e);
-                            }
-                        });
+                        .addOnFailureListener(e -> Log.w("Inventory Manager", "Error adding document", e));
 
-                db.collection("Orders").whereEqualTo("status", "Open").get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                    for (QueryDocumentSnapshot snap : task.getResult()) {
-                                        DocumentReference orderRef = snap.getReference();
+                // **Find all open orders and add the item reference**
+                db.collection("Orders")
+                        .whereEqualTo("status", "Open")
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                DocumentReference stockItemRef = db.collection("Stock").document(item.getStockId());
 
-                                        // Get the existing item references list
-                                        List<DocumentReference> itemRefs = (List<DocumentReference>) snap.get("items");
-                                        if (itemRefs == null) {
-                                            itemRefs = new ArrayList<>();
-                                        }
+                                for (QueryDocumentSnapshot snap : task.getResult()) {
+                                    DocumentReference orderRef = snap.getReference();
 
-                                        // Reference to the FridgeItem document
-                                        DocumentReference stockItemRef = db.collection("Stock").document(item.getStockId());
-
-                                        // Check if the item reference already exists
-                                        boolean exists = false;
-                                        for (DocumentReference existingRef : itemRefs) {
-                                            if (existingRef.getPath().equals(stockItemRef.getPath())) {
-                                                exists = true;
-                                                break;
-                                            }
-                                        }
-
-                                        // Append the item reference only if it does not already exist
-                                        if (!exists) {
-                                            itemRefs.add(stockItemRef);
-                                            orderRef.update("items", itemRefs)
-                                                    .addOnSuccessListener(aVoid ->
-                                                            Log.d("Firestore", "Item reference added successfully"))
-                                                    .addOnFailureListener(e ->
-                                                            Log.e("Firestore", "Error updating document", e));
-                                        } else {
-                                            Log.d("Firestore", "Item reference already exists in the array");
-                                        }
-                                    }
-                                } else {
-                                    Log.e("Firestore", "No open orders found or error fetching documents", task.getException());
+                                    // Directly add reference using arrayUnion
+                                    orderRef.update("items", FieldValue.arrayUnion(stockItemRef))
+                                            .addOnSuccessListener(aVoid ->
+                                                    Log.d("Firestore", "Item reference added successfully"))
+                                            .addOnFailureListener(e ->
+                                                    Log.e("Firestore", "Error updating document", e));
                                 }
+                            } else {
+                                Log.e("Firestore", "No open orders found or error fetching documents", task.getException());
                             }
                         });
-                addingItem = false;
 
+                addingItem = false;
             }
         }
     }
