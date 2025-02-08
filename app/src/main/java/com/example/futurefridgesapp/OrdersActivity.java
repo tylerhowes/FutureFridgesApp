@@ -43,11 +43,11 @@ public class OrdersActivity extends AppCompatActivity {
         TableLayout tableLayout = findViewById(R.id.ordersTable);
 
         ArrayList<FridgeItem> items = new ArrayList<>();
-        items.add(new FridgeItem("Cheese", "01", "Jun 10, 2024", 1, "25/01/2025") );
+        //items.add(new FridgeItem("Cheese", "01", "Jun 10, 2024", 1, "25/01/2025") );
 
         // Example list of orders
         ArrayList<Order> orders = new ArrayList<>();
-        orders.add(new Order("01", "test", "X", getString(R.string.completed), items));
+        //orders.add(new Order("01", "test", "X", getString(R.string.completed), items));
 
         CollectionReference ordersRef = db.collection("Orders");
         ordersRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -73,17 +73,18 @@ public class OrdersActivity extends AppCompatActivity {
                                             DocumentSnapshot itemSnapshot = itemTask.getResult();
 
                                             String name = itemSnapshot.getString("name");
-                                            String id = itemSnapshot.getString("id");
+                                            String itemId = itemSnapshot.getString("itemId");
+                                            String stockID = itemSnapshot.getString("stockId");
                                             String expiry = itemSnapshot.getString("expiry");
-                                            int quantity = itemSnapshot.getLong("quantity").intValue();
+                                            int quantity = Integer.valueOf(itemSnapshot.getLong("quantity").toString());
                                             String dateAdded = itemSnapshot.getString("dateAdded");
 
-                                            FridgeItem fridgeItem = new FridgeItem(name, id, expiry, quantity, dateAdded);
+                                            FridgeItem fridgeItem = new FridgeItem(name, itemId, stockID, expiry, quantity, dateAdded);
                                             items.add(fridgeItem);
 
-                                            Log.d("DeliveryActivity", "Item: " + fridgeItem.toString());
+                                            Log.d("OrdersActivity", "Item: " + fridgeItem.toString());
                                         } else {
-                                            Log.e("DeliveryActivity", "Failed to fetch item: " + itemRef.getId());
+                                            Log.e("OrdersActivity", "Failed to fetch item: " + itemRef.getId());
                                         }
 
 

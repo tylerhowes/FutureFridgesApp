@@ -49,6 +49,7 @@ public class InventoryManager {
     }
 
     public void loadInitialItems() {
+
         db.collection("Inventory").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -56,10 +57,20 @@ public class InventoryManager {
                     for (QueryDocumentSnapshot document : task.getResult()){
                         int expiry = Integer.parseInt(document.getString("expiry"));
                         String dateAdded = document.getString("dateAdded");
-
                         String expiryDate = calculateExpiry(dateAdded, expiry);
+                        String stockId = document.getString("stockId");
+                        String name = document.getString("name");
+                        String itemId = document.getString("itemId");
+                        int quantity = Integer.valueOf(document.get("quantity").toString());
 
-                        addItem(document.getString("name"), document.getId(), expiryDate, Integer.valueOf(document.get("quantity").toString()), document.getString("dateAdded"));
+
+                        addItem(name,
+                                itemId,
+                                stockId,
+                                expiryDate,
+                                quantity,
+                                dateAdded
+                                );
                     }
                 } else{
                     Log.d("InventoryManager", "Error getting Inventory document: ", task.getException());
@@ -92,14 +103,20 @@ public class InventoryManager {
         Log.d("InventoryManager", "The difference in date is: " + difference + " Days");
 
         if(difference <= 0){
-            NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification("Expiry Date", currentDate, item.getName() + " is expiring", "Expired");
+            NotificationActivity.Notification expiryNotification = new NotificationActivity.Notification(null, "Expiry Date", currentDate, item.getName() + " is expiring", "Expired");
 
             db.collection("Notifications")
-                    .add(lowStockNotification)
+                    .add(expiryNotification)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + documentReference.getId());
+                            String generatedId = documentReference.getId();
+                            Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + generatedId);
+
+                            // Update the Firestore document with its generated ID
+                            documentReference.update("id", generatedId)
+                                    .addOnSuccessListener(aVoid -> Log.d("Inventory Manager", "Notification updated with ID"))
+                                    .addOnFailureListener(e -> Log.w("Inventory Manager", "Error updating document with ID", e));
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -137,8 +154,8 @@ public class InventoryManager {
         return cal.getTime();
     }
 
-    private void addItem(String name, String id, String expiry, int quantity, String dateAdded) {
-        FridgeItem newItem = new FridgeItem(name, id, expiry, quantity, dateAdded);
+    private void addItem(String name, String itemId,String stockID, String expiry, int quantity, String dateAdded) {
+        FridgeItem newItem = new FridgeItem(name, itemId,stockID, expiry, quantity, dateAdded);
         checkExpiry(newItem);
         itemList.add(newItem);
         refreshTable(itemList);
@@ -146,13 +163,15 @@ public class InventoryManager {
 
     private void removeItem(FridgeItem item) {
         itemList.remove(item);
+        db.collection("Inventory").document(item.getItemId()).delete();
         refreshTable(itemList);
     }
 
     private void updateItemQuantity(FridgeItem item, int quantity) {
+        Log.d("InventoryManager", "Updating item: " + item.getItemId() + " to quantity " + quantity);
         if (quantity >= 0) {
             item.setQuantity(quantity);
-            db.collection("Inventory").document(item.getId()).set(item);
+            db.collection("Inventory").document(item.getItemId()).update("quantity", quantity);
             refreshTable(itemList);
         }
 
@@ -163,14 +182,20 @@ public class InventoryManager {
                 SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 String formattedDate = df.format(c);
                 Log.d("Inventory Manager", "Date: " + formattedDate);
-                NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification("Low Stock", formattedDate, item.getName() + " is low on stock", "Low Stock");
+                NotificationActivity.Notification lowStockNotification = new NotificationActivity.Notification(null, "Low Stock", formattedDate, item.getName() + " is low on stock", "Low Stock");
 
                 db.collection("Notifications")
                         .add(lowStockNotification)
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
-                                Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + documentReference.getId());
+                                String generatedId = documentReference.getId();
+                                Log.d("Inventory Manager", "DocumentSnapshot written with ID: " + generatedId);
+
+                                // Update the Firestore document with its generated ID
+                                documentReference.update("id", generatedId)
+                                        .addOnSuccessListener(aVoid -> Log.d("Inventory Manager", "Notification updated with ID"))
+                                        .addOnFailureListener(e -> Log.w("Inventory Manager", "Error updating document with ID", e));
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -195,12 +220,12 @@ public class InventoryManager {
                                         }
 
                                         // Reference to the FridgeItem document
-                                        DocumentReference fridgeItemRef = db.collection("Inventory").document(item.getId());
+                                        DocumentReference stockItemRef = db.collection("Stock").document(item.getStockId());
 
                                         // Check if the item reference already exists
                                         boolean exists = false;
                                         for (DocumentReference existingRef : itemRefs) {
-                                            if (existingRef.getPath().equals(fridgeItemRef.getPath())) {
+                                            if (existingRef.getPath().equals(stockItemRef.getPath())) {
                                                 exists = true;
                                                 break;
                                             }
@@ -208,7 +233,7 @@ public class InventoryManager {
 
                                         // Append the item reference only if it does not already exist
                                         if (!exists) {
-                                            itemRefs.add(fridgeItemRef);
+                                            itemRefs.add(stockItemRef);
                                             orderRef.update("items", itemRefs)
                                                     .addOnSuccessListener(aVoid ->
                                                             Log.d("Firestore", "Item reference added successfully"))
@@ -311,16 +336,10 @@ public class InventoryManager {
 
     public void addOrder(List<FridgeItem> orderItems){
         for(FridgeItem item : orderItems){
-
-            db.collection("Inventory").document(item.getId()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            db.collection("Inventory").add(item).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()){
-                        DocumentSnapshot docSnapshot = task.getResult();
-                        int oldQuantity = docSnapshot.getLong("quantity").intValue();
-                        item.setQuantity(oldQuantity+1);
-                        db.collection("Inventory").document(item.getId()).set(item);
-                    }
+                public void onSuccess(DocumentReference documentReference) {
+                    documentReference.update("itemId", documentReference.getId());
                 }
             });
         }
