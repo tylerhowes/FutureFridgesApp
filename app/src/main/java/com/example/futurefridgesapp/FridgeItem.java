@@ -5,14 +5,16 @@ package com.example.futurefridgesapp;
 public class FridgeItem {
 
     private final String name;
-    private final String id;
+    private final String stockID;
+    private final String itemId;
     private final String expiry;
     private int quantity;
     private final String dateAdded;
 
-    public FridgeItem(String name, String id, String expiry, int quantity, String dateAdded) {
+    public FridgeItem(String name, String itemId, String stockId, String expiry, int quantity, String dateAdded) {
         this.name = name;
-        this.id = id;
+        this.itemId = itemId;
+        this.stockID = stockId;
         this.expiry = expiry;
         this.quantity = quantity;
         this.dateAdded = dateAdded;
@@ -26,8 +28,12 @@ public class FridgeItem {
         return name;
     }
 
-    public String getId() {
-        return id;
+    public String getItemId() {
+        return itemId;
+    }
+
+    public String getStockId() {
+        return stockID;
     }
 
     public String getExpiry() {

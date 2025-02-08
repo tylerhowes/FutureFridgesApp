@@ -39,7 +39,12 @@ public class NotificationActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()){
                     for (QueryDocumentSnapshot document : task.getResult()){
-                        Notification notification = new Notification(document.getString("title"), document.getString("date"), document.getString("message"), document.getString("action"));
+                        Notification notification = new Notification(
+                                document.getId(),
+                                document.getString("title"),
+                                document.getString("date"),
+                                document.getString("message"),
+                                document.getString("action"));
                         notificationArrayList.add(notification);
 
                     }
@@ -84,13 +89,13 @@ public class NotificationActivity extends AppCompatActivity {
         LinearLayout card = createCardContainer();
 
         // Add the header (title and close icon)
-        card.addView(createCardHeader(notification.getTitle(), notification.getDate(), container, card));
+        card.addView(createCardHeader(notification.getTitle(), notification.getDate(), container, card, notification.getDocumentID()));
 
         // Add the message
         card.addView(createCardMessage(notification.getMessage()));
 
         // Add the action button
-        card.addView(createActionButton(notification.getAction(), container, card));
+        card.addView(createActionButton(notification.getAction(), container, card, notification.getDocumentID()));
 
         return card;
     }
@@ -122,7 +127,7 @@ public class NotificationActivity extends AppCompatActivity {
      * @param card      The card to remove when the close icon is clicked.
      * @return A LinearLayout representing the card header.
      */
-    private LinearLayout createCardHeader(String titleText, String date, LinearLayout container, LinearLayout card) {
+    private LinearLayout createCardHeader(String titleText, String date, LinearLayout container, LinearLayout card, String documentId) {
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setLayoutParams(new LinearLayout.LayoutParams(
@@ -166,8 +171,10 @@ public class NotificationActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 1
         ));;
-        closeIcon.setOnClickListener(v -> container.removeView(card));
-        header.addView(closeIcon);
+        closeIcon.setOnClickListener(v -> {
+            deleteNotification(documentId, container, card);
+        });
+
 
         return header;
     }
@@ -195,31 +202,46 @@ public class NotificationActivity extends AppCompatActivity {
      * @param card       The card to remove when the button is clicked.
      * @return A Button representing the action button.
      */
-    private Button createActionButton(String buttonText, LinearLayout container, LinearLayout card) {
+    private Button createActionButton(String buttonText, LinearLayout container, LinearLayout card, String documentId) {
         Button actionButton = new Button(this);
         actionButton.setText(buttonText);
         actionButton.setBackgroundTintList(getColorStateList(R.color.black));
         actionButton.setTextColor(Color.WHITE);
         actionButton.setOnClickListener(v -> {
             // Handle button action (e.g., remove the card)
-            container.removeView(card);
+            deleteNotification(documentId, container, card);
+
         });
         return actionButton;
     }
 
+    private void deleteNotification(String documentId, LinearLayout container, LinearLayout card) {
+        db.collection("Notifications").document(documentId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    container.removeView(card);
+                    Log.d("NotificationActivity", "Notification deleted successfully.");
+                })
+                .addOnFailureListener(e -> Log.e("NotificationActivity", "Error deleting notification", e));
+    }
+
     // Notification model class
     static class Notification {
+        private final String documentID;
         private final String title;
         private final String date;
         private final String message;
         private final String action;
 
-        public Notification(String title, String date, String message, String action) {
+        public Notification(String documentID, String title, String date, String message, String action) {
+            this.documentID = documentID;
             this.title = title;
             this.date = date;
             this.message = message;
             this.action = action;
         }
+
+        public String getDocumentID(){return documentID;}
 
         public String getDate()
         {

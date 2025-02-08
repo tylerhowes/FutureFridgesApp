@@ -64,7 +64,7 @@ public class OrderManager {
 
             Log.d("Order Manager", "Order status: " + order.getStatus());
             // Action
-            if(order.getStatus().equals("Pending")){
+            if(order.getStatus().equals("Open")){
                 Button actionView = new Button(tableLayout.getContext());
                 actionView.setText("Edit");
                 actionView.setGravity(Gravity.CENTER);
