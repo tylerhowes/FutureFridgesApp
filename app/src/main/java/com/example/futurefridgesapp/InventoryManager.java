@@ -226,6 +226,8 @@ public class InventoryManager {
                 addingItem = false;
             }
         }
+
+
     }
 
     public void searchItems(String query) {

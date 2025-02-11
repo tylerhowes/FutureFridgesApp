@@ -13,6 +13,9 @@
         android:theme="@style/Theme.FutureFridgesApp"
         tools:targetApi="31">
         <activity
+            android:name=".AddUserActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddItemActivity"
             android:exported="false" />
         <activity

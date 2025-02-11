@@ -57,16 +57,13 @@ public class AddNewItemActivity extends AppCompatActivity {
                 String quantity = quantityText.getText().toString();
 
                 if(!name.isEmpty() && !expiry.isEmpty() && !quantity.isEmpty()){
-                    //check name
-                    //check expiry days
-                    //check quantity
 
                     Map<String, Object> data = new HashMap<>();
 
                     data.put("expiry", expiry);
                     data.put("name", name);
                     data.put("quantity", quantity);
-                    //Add ID
+
 
                     db.collection("Stock").add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
