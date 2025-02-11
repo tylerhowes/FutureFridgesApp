@@ -109,8 +109,8 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        addNewStockButton.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, AddNewItemActivity.class);
+        addNewUserButton.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, AddUserActivity.class);
             startActivity(intent);
         });
 
