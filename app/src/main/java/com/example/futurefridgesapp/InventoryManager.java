@@ -1,6 +1,8 @@
 package com.example.futurefridgesapp;
 
+import android.graphics.Typeface;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
@@ -13,6 +15,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -27,23 +30,26 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class InventoryManager {
 
     private TableLayout tableLayout;
     private ArrayList<FridgeItem> itemList;
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String userRole;
     boolean addingItem = false;
 
-    public InventoryManager(){
+    public InventoryManager() {
 
     }
 
-    public InventoryManager(TableLayout tableLayout, ArrayList<FridgeItem> itemList, String userRole){
+    public InventoryManager(TableLayout tableLayout, ArrayList<FridgeItem> itemList, String userRole) {
         this.tableLayout = tableLayout;
         this.itemList = itemList;
         this.userRole = userRole;
@@ -54,8 +60,8 @@ public class InventoryManager {
         db.collection("Inventory").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
-                    for (QueryDocumentSnapshot document : task.getResult()){
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
                         int expiry = Integer.parseInt(document.getString("expiry"));
                         String dateAdded = document.getString("dateAdded");
                         String expiryDate = calculateExpiry(dateAdded, expiry);
@@ -71,16 +77,16 @@ public class InventoryManager {
                                 expiryDate,
                                 quantity,
                                 dateAdded
-                                );
+                        );
                     }
-                } else{
+                } else {
                     Log.d("InventoryManager", "Error getting Inventory document: ", task.getException());
                 }
             }
         });
     }
 
-    private String calculateExpiry(String dateAdded, int numberOfDays){
+    private String calculateExpiry(String dateAdded, int numberOfDays) {
         DateTimeFormatter formatter = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -92,7 +98,7 @@ public class InventoryManager {
         return "00/00/0000";
     }
 
-    private void checkExpiry(FridgeItem item){
+    private void checkExpiry(FridgeItem item) {
 
         String expiryDate = item.getExpiry();
 
@@ -103,7 +109,7 @@ public class InventoryManager {
         int difference = (int) getDateDiff(df, currentDate, expiryDate);
         Log.d("InventoryManager", "The difference in date is: " + difference + " Days");
 
-        if(difference <= 0){
+        if (difference <= 0) {
             NotificationActivity.Notification expiryNotification = new NotificationActivity.Notification(null, "Expiry Date", currentDate, item.getName() + " is expiring", "Expired");
 
             db.collection("Notifications")
@@ -155,8 +161,8 @@ public class InventoryManager {
         return cal.getTime();
     }
 
-    private void addItem(String name, String itemId,String stockID, String expiry, int quantity, String dateAdded) {
-        FridgeItem newItem = new FridgeItem(name, itemId,stockID, expiry, quantity, dateAdded);
+    private void addItem(String name, String itemId, String stockID, String expiry, int quantity, String dateAdded) {
+        FridgeItem newItem = new FridgeItem(name, itemId, stockID, expiry, quantity, dateAdded);
         checkExpiry(newItem);
         itemList.add(newItem);
         refreshTable(itemList);
@@ -175,6 +181,23 @@ public class InventoryManager {
             item.setQuantity(quantity);
             db.collection("Inventory").document(item.getItemId()).update("quantity", quantity);
             refreshTable(itemList);
+
+            Map<String, Object> logDetails = new HashMap<>();
+
+            String currentDate = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                currentDate = LocalDate.now().format(formatter);
+            }
+
+            DocumentReference logRef = db.collection("Inventory").document(item.getItemId());
+            DocumentReference userRef = db.collection("Users").document(auth.getUid());
+
+            logDetails.put("dateTime", currentDate);
+            logDetails.put("log", logRef);
+            logDetails.put("user", userRef);
+
+            db.collection("InventoryLogs").add(logDetails);
         }
 
         if (!addingItem) {
@@ -243,9 +266,41 @@ public class InventoryManager {
     private void refreshTable(List<FridgeItem> items) {
         tableLayout.removeAllViews();
 
-        Log.d("INVENTORY MANAGE", "Role signing in: " + userRole);
-        for (FridgeItem item : items) {
-            if(userRole.equals("headchef") || userRole.equals("admin")){
+
+        if (userRole.equals("headchef") || userRole.equals("admin")) {
+
+
+            // Create a header row
+            TableRow headerRow = new TableRow(tableLayout.getContext());
+
+            View view1 = new View(tableLayout.getContext());
+            View view2 = new View(tableLayout.getContext());
+
+            TextView headerItem = new TextView(tableLayout.getContext());
+            headerItem.setText("Name");
+            headerItem.setTypeface(null, Typeface.BOLD);
+
+
+            TextView headerExpiry = new TextView(tableLayout.getContext());
+            headerExpiry.setText("Expiry");
+            headerExpiry.setTypeface(null, Typeface.BOLD);
+
+            TextView headerQuantity = new TextView(tableLayout.getContext());
+            headerQuantity.setText("Date");
+            headerQuantity.setTypeface(null, Typeface.BOLD);
+
+
+            headerRow.addView(view1);
+            headerRow.addView(view2);
+            headerRow.addView(headerItem);
+            headerRow.addView(headerExpiry);
+            headerRow.addView(headerQuantity);
+
+            tableLayout.addView(headerRow);
+
+
+            for (FridgeItem item : items) {
+
                 TableRow row = new TableRow(tableLayout.getContext());
 
                 ImageButton plusButton = new ImageButton(tableLayout.getContext());
@@ -283,7 +338,35 @@ public class InventoryManager {
                 row.addView(deleteButton);
                 tableLayout.addView(row);
             }
-            else{
+        } else {
+            // Create a header row
+
+            TableRow headerRow = new TableRow(tableLayout.getContext());
+
+
+            TextView headerItem = new TextView(tableLayout.getContext());
+            headerItem.setText("Name");
+            headerItem.setTypeface(null, Typeface.BOLD);
+
+
+            TextView headerExpiry = new TextView(tableLayout.getContext());
+            headerExpiry.setText("Expiry");
+            headerExpiry.setTypeface(null, Typeface.BOLD);
+
+            TextView headerQuantity = new TextView(tableLayout.getContext());
+            headerQuantity.setText("Date");
+            headerQuantity.setTypeface(null, Typeface.BOLD);
+
+
+
+            headerRow.addView(headerItem);
+            headerRow.addView(headerExpiry);
+            headerRow.addView(headerQuantity);
+
+            tableLayout.addView(headerRow);
+
+
+            for (FridgeItem item : items) {
                 TableRow row = new TableRow(tableLayout.getContext());
 
                 ImageButton minusButton = new ImageButton(tableLayout.getContext());
@@ -307,8 +390,10 @@ public class InventoryManager {
 
                 tableLayout.addView(row);
             }
+
         }
     }
+
 
     public void addOrder(List<FridgeItem> orderItems){
         for(FridgeItem item : orderItems){

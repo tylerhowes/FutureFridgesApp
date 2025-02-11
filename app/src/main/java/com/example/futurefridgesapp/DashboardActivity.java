@@ -36,6 +36,7 @@ public class DashboardActivity extends AppCompatActivity {
         Button notificationButton = findViewById(R.id.notification_button);
         Button addNewStockButton = findViewById(R.id.add_new_stock_button);
         Button addNewUserButton = findViewById(R.id.add_user_button);
+        Button inventoryLogsButton = findViewById(R.id.invetory_logs_button);
 
 
         //get user role
@@ -53,17 +54,14 @@ public class DashboardActivity extends AppCompatActivity {
                                 notificationButton.setVisibility(View.GONE);
                                 addNewUserButton.setVisibility(View.GONE);
                                 addNewStockButton.setVisibility(View.GONE);
+                                inventoryLogsButton.setVisibility(View.GONE);
 
                             case "headchef":
                                 addNewUserButton.setVisibility(View.GONE);
                                 addNewStockButton.setVisibility(View.GONE);
 
                             case "admin":
-
-
-                                //chef
-                                //headchef
-                                //admin
+                                //Admin has full access
                         }
                     } else{
 
@@ -111,6 +109,11 @@ public class DashboardActivity extends AppCompatActivity {
 
         addNewUserButton.setOnClickListener(v -> {
             Intent intent = new Intent(DashboardActivity.this, AddUserActivity.class);
+            startActivity(intent);
+        });
+
+        inventoryLogsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, InventoryLogsActivity.class);
             startActivity(intent);
         });
 

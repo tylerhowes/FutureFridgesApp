@@ -54,14 +54,6 @@ public class AddItemActivity extends AppCompatActivity {
         });
     }
 
-//
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//
-//        loadInitialItems();
-//    }
-
     public void loadInitialItems() {
 
         db.collection("Stock").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -86,29 +78,6 @@ public class AddItemActivity extends AppCompatActivity {
             }
         });
     }
-
-//    private void listenForStockChanges() {
-//        db.collection("Stock").addSnapshotListener((querySnapshot, error) -> {
-//            if (error != null) {
-//                Log.e("Firestore", "Error listening to stock updates", error);
-//                return;
-//            }
-//            if (querySnapshot != null) {
-//                itemList.clear();
-//                for (QueryDocumentSnapshot document : querySnapshot) {
-//                    String name = document.getString("name");
-//                    String expiry = document.getString("expiry");
-//                    int quantity = Integer.parseInt(document.getString("quantity"));
-//                    String stockId = document.getId();
-//
-//                    FridgeItem item = new FridgeItem(name, null, stockId, expiry, quantity, null);
-//                    itemList.add(item);
-//                }
-//                refreshTable(itemList);
-//            }
-//        });
-//    }
-
 
     private void addItem(FridgeItem item) {
         db.collection("Orders")
