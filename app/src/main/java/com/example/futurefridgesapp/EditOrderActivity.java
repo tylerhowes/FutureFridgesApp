@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
@@ -11,6 +12,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -21,6 +24,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -45,6 +49,14 @@ public class EditOrderActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     String orderId;
 
+    private final ActivityResultLauncher<Intent> addItemLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    loadInitialItems();  // Refresh on return
+                }
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +74,20 @@ public class EditOrderActivity extends AppCompatActivity {
         itemList = new ArrayList<>();
         tableLayout = findViewById(R.id.item_table);
         loadInitialItems();
+
+        FloatingActionButton addItem = findViewById(R.id.add_item);
+
+        addItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(EditOrderActivity.this, AddItemActivity.class);
+                intent.putExtra("orderId", orderId);
+                addItemLauncher.launch(intent);
+            }
+        });
     }
+
+
 
     public void loadInitialItems() {
 
@@ -70,6 +95,7 @@ public class EditOrderActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()){
+                    itemList.clear();
                     QuerySnapshot querySnapshot = task.getResult();
                     for(QueryDocumentSnapshot document : querySnapshot) {
                         String deliveryID = document.getString("deliveryID");

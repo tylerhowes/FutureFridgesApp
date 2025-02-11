@@ -200,7 +200,7 @@ public class InventoryManager {
                         })
                         .addOnFailureListener(e -> Log.w("Inventory Manager", "Error adding document", e));
 
-                // **Find all open orders and add the item reference**
+                // Find open order and add the item reference
                 db.collection("Orders")
                         .whereEqualTo("status", "Open")
                         .get()
