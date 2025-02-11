@@ -1,6 +1,8 @@
 package com.example.futurefridgesapp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -17,9 +19,11 @@ public class OrderManager {
 
     private ArrayList<Order> orders;
     private TableLayout tableLayout;
+    private Context context;
 
-    public OrderManager(TableLayout tableLayout, ArrayList<Order> orders){
+    public OrderManager(TableLayout tableLayout, ArrayList<Order> orders, Context context){
 
+        this.context = context;
         this.orders = orders;
         this.tableLayout = tableLayout;
         refreshTable();
@@ -33,6 +37,30 @@ public class OrderManager {
 
     public void refreshTable(){
         tableLayout.removeAllViews();
+
+        // Create a header row
+        TableRow headerRow = new TableRow(tableLayout.getContext());
+
+        TextView headerName = new TextView(tableLayout.getContext());
+        headerName.setText("Order ID");
+        headerName.setTypeface(null, Typeface.BOLD);
+
+        TextView headerQuantity = new TextView(tableLayout.getContext());
+        headerQuantity.setText("Supplier");
+        headerQuantity.setTypeface(null, Typeface.BOLD);
+
+        TextView headerActions = new TextView(tableLayout.getContext());
+        headerActions.setText("Status");
+        headerActions.setTypeface(null, Typeface.BOLD);
+
+        // Add header views to the row
+        headerRow.addView(headerName);
+        headerRow.addView(headerQuantity);
+        headerRow.addView(headerActions);
+
+        // Add the header row to the table layout
+        tableLayout.addView(headerRow);
+
         // Populate the table
         for (Order order : orders) {
             TableRow row = new TableRow(tableLayout.getContext());
@@ -70,6 +98,14 @@ public class OrderManager {
                 actionView.setGravity(Gravity.CENTER);
                 actionView.setPadding(16, 16, 16, 16);
                 row.addView(actionView);
+
+                actionView.setOnClickListener(v -> {
+                    Intent intent = new Intent(context, EditOrderActivity.class);
+                    intent.putExtra("orderId", order.getId());
+                    context.startActivity(intent);
+
+
+                });
             }else{
                 View view = new View(tableLayout.getContext());
                 view.setPadding(16,16,16,16);

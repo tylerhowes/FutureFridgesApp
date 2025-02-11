@@ -68,7 +68,7 @@ public class AddNewItemActivity extends AppCompatActivity {
                     data.put("quantity", quantity);
                     //Add ID
 
-                    db.collection("Inventory").add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    db.collection("Stock").add(data).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
                             String documentID = documentReference.getId();
