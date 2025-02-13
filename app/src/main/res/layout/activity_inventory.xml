@@ -48,7 +48,7 @@
             android:text="Dashboard"
             />
 
-        
+
         <!-- Table Layout -->
         <TableLayout
             android:id="@+id/inventory_table"

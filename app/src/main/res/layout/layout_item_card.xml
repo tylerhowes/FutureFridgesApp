@@ -3,7 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#FFFFFF"
     android:gravity="center">
+
+
 
 
     <ImageView
@@ -31,6 +34,7 @@
         <Button
             android:layout_width="60dp"
             android:layout_height="40dp"
+            android:backgroundTint="#000000"
             android:text="-"
             android:layout_gravity="center"/>
         <TextView
@@ -45,6 +49,7 @@
         <Button
             android:layout_width="60dp"
             android:layout_height="40dp"
+            android:backgroundTint="#000000"
             android:text="+"
             android:layout_gravity="center"
             />

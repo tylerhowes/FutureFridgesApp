@@ -1,127 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="#FFFFFF"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddUserActivity">
 
+    <!-- Top Bar -->
     <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="#92AFB3"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Centered CardView -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="20dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#FFFFFF"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.37">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
 
+            <!-- Title: Register New User -->
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="2"
+                android:text="Register New User"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingBottom="12dp"/>
+
+            <!-- Email Input -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="Email"
-                android:textAlignment="textEnd"
-                android:textSize="20sp" />
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/user_email"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="3"
-                android:hint="Email" />
-        </LinearLayout>
+                android:hint="Enter Email"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            <!-- Password Input -->
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="2"
+                android:layout_marginTop="12dp"
                 android:text="Password"
-                android:textAlignment="textEnd"
-                android:textSize="20sp" />
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/user_password"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="3"
-                android:hint="Password (6+ characters)" />
-        </LinearLayout>
+                android:hint="Password (6+ characters)"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:inputType="textPassword"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            <!-- Passcode Input -->
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="2"
+                android:layout_marginTop="12dp"
                 android:text="App Passcode"
-                android:textAlignment="textEnd"
-                android:textSize="20sp" />
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/user_passcode"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="3"
-                android:hint="Passcode (3 integers)"
+                android:hint="Passcode (3 digits)"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
                 android:inputType="number"/>
-        </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            <!-- Role Dropdown -->
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="2"
+                android:layout_marginTop="12dp"
                 android:text="Role"
-                android:textAlignment="textEnd"
-                android:textSize="20sp" />
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/user_role_spinner"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="3"
-                android:hint="password (6 characters+)" />
+                android:padding="8dp"
+                android:background="@android:drawable/edit_text"/>
+
+            <!-- Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="16dp">
+
+                <Button
+                    android:id="@+id/save_button"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Save"
+
+                    android:textColor="#FFFFFF"
+                    android:padding="12dp"/>
+
+                <Button
+                    android:id="@+id/cancel_button"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Cancel"
+                    android:backgroundTint="#D32F2F"
+                    android:textColor="#FFFFFF"
+                    android:padding="12dp"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
+
         </LinearLayout>
 
-        <Button
-            android:id="@+id/save_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:text="Save" />
+    </androidx.cardview.widget.CardView>
 
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:text="Cancel" />
-
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
