@@ -66,8 +66,13 @@
         android:id="@+id/deliveryIdInput"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         android:layout_width="291dp"
         android:layout_height="50dp"
+=======
+        android:layout_width="321dp"
+        android:layout_height="41dp"
+>>>>>>> Stashed changes
 =======
         android:layout_width="321dp"
         android:layout_height="41dp"
@@ -90,8 +95,11 @@
         app:layout_constraintVertical_bias="0.371" />
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
