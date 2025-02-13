@@ -120,7 +120,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="@string/create_new_order"
-            android:backgroundTint="#000"
+
             android:textColor="#FFF"
             android:layout_marginBottom="8dp" />
 
@@ -130,7 +130,6 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="@string/dashboard"
-            android:backgroundTint="#000"
             android:textColor="#FFF" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

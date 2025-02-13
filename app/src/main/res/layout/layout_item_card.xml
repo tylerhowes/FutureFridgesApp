@@ -34,7 +34,7 @@
         <Button
             android:layout_width="60dp"
             android:layout_height="40dp"
-            android:backgroundTint="#000000"
+
             android:text="-"
             android:layout_gravity="center"/>
         <TextView
@@ -49,7 +49,7 @@
         <Button
             android:layout_width="60dp"
             android:layout_height="40dp"
-            android:backgroundTint="#000000"
+
             android:text="+"
             android:layout_gravity="center"
             />

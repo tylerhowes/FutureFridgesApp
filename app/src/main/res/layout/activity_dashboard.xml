@@ -56,14 +56,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Inventory"
-            android:backgroundTint="#000000"
             android:layout_marginBottom="8dp" />
 
         <Button
             android:id="@+id/orders_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="#000000"
+
             android:text="Orders"
             android:layout_marginBottom="8dp" />
 
@@ -72,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Notifications"
-            android:backgroundTint="#000000"
+
             android:layout_marginBottom="8dp"/>
 
         <Button
@@ -80,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Add New User"
-            android:backgroundTint="#000000"
+
             android:layout_marginBottom="8dp" />
 
         <Button
@@ -88,10 +87,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Add New Stock Item"
-            android:backgroundTint="#000000"
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
+
             android:layout_marginBottom="8dp" />
 
         <Button
@@ -99,12 +96,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Inventory Logs"
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
             android:layout_marginBottom="8dp" />
 
     </LinearLayout>
