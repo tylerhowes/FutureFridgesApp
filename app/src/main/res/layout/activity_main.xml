@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="#FFFFFF"
     android:layout_width="match_parent"
     android:background="#FFFFFF"
     android:layout_height="match_parent"
@@ -11,6 +12,7 @@
     tools:context=".MainActivity">
 
 
+<<<<<<< Updated upstream
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -18,6 +20,22 @@
         android:background="#92AFB3"
         android:orientation="horizontal"
         android:padding="8dp"
+=======
+    <EditText
+        android:id="@+id/passcodeText"
+        android:layout_width="226dp"
+        android:layout_height="50dp"
+        android:background="@android:drawable/editbox_background"
+        android:backgroundTint="#DBD7D7"
+        android:hint="Passcode"
+        android:inputType="number"
+        android:textAlignment="center"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+>>>>>>> Stashed changes
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -27,11 +45,17 @@
         android:id="@+id/loginMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+<<<<<<< Updated upstream
         android:layout_marginTop="60dp"
         android:text="Welcome Back!"
         android:textColor="#333333"
         android:textSize="22sp"
         android:textStyle="bold"
+=======
+        android:text="Login"
+        android:backgroundTint="#000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+>>>>>>> Stashed changes
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar" />
