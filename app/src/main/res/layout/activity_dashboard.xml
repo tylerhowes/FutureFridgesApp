@@ -84,6 +84,13 @@
             android:text="Add New Stock Item"
             android:layout_marginBottom="8dp" />
 
+        <Button
+            android:id="@+id/health_report_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Generate Health and Safety Report" />
+
     </LinearLayout>
 
     <!-- Notification Pop-up -->
