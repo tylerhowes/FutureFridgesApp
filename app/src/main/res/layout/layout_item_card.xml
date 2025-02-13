@@ -7,8 +7,6 @@
     android:gravity="center">
 
 
-
-
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -34,11 +32,6 @@
         <Button
             android:layout_width="60dp"
             android:layout_height="40dp"
-<<<<<<< Updated upstream
-
-=======
-            android:backgroundTint="#000000"
->>>>>>> Stashed changes
             android:text="-"
             android:layout_gravity="center"/>
         <TextView
@@ -53,11 +46,6 @@
         <Button
             android:layout_width="60dp"
             android:layout_height="40dp"
-<<<<<<< Updated upstream
-
-=======
-            android:backgroundTint="#000000"
->>>>>>> Stashed changes
             android:text="+"
             android:layout_gravity="center"
             />
