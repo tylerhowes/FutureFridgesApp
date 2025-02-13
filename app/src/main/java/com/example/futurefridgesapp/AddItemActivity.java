@@ -120,7 +120,7 @@ public class AddItemActivity extends AppCompatActivity {
                 });
     }
 
-    private void refreshTable(List<FridgeItem> items) {
+    public void refreshTable(List<FridgeItem> items) {
         tableLayout.removeAllViews();
 
         // Create a header row
