@@ -86,7 +86,7 @@ public class InventoryManager {
         });
     }
 
-    private String calculateExpiry(String dateAdded, int numberOfDays) {
+    public String calculateExpiry(String dateAdded, int numberOfDays) {
         DateTimeFormatter formatter = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -98,7 +98,7 @@ public class InventoryManager {
         return "00/00/0000";
     }
 
-    private void checkExpiry(FridgeItem item) {
+    public void checkExpiry(FridgeItem item) {
 
         String expiryDate = item.getExpiry();
 
